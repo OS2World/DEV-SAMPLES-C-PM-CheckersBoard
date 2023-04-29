@@ -1,11 +1,10 @@
 ;---------------------------------------------------
-; CHECKERS.DEF module definition file, version 0.10
+; CHECKERS.DEF module definition file, version 0.20
 ;---------------------------------------------------
 
 NAME           CHECKERS  WINDOWAPI
 
-DESCRIPTION    'Checkers Version 0.10 (c) 1990, Charles Petzold'
-PROTMODE
+DESCRIPTION    '@#OS2World:0.20#@##1## 29 Apr 2022 20:19:00     ARCAOS-507::::::v0.20@@A checkers board sample for PM.'
 HEAPSIZE       1024
 STACKSIZE      8192
 EXPORTS        ClientWndProc

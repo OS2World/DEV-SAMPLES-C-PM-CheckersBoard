@@ -1,5 +1,5 @@
 /*------------------------------------
-   CHDRAW.H header file, version 0.10
+   CHDRAW.H header file, version 0.20
   ------------------------------------*/
 
 MRESULT EXPENTRY ColorDlgProc (HWND hwnd, USHORT msg, MPARAM mp1, MPARAM mp2) ;

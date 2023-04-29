@@ -1,5 +1,5 @@
 /*-------------------------------------------
-   CHECKERS.RC resource script, version 0.10
+   CHECKERS.RC resource script, version 0.20
   -------------------------------------------*/
 
 #include <os2.h>

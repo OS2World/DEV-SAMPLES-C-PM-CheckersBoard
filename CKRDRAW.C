@@ -1,6 +1,5 @@
 /*--------------------------------------------------------------------
-   CKRDRAW.C source code file for Ckd drawing functions, version 0.10
-             (c) 1990, Charles Petzold
+   CKRDRAW.C source code file for Ckd drawing functions, version 0.20
   --------------------------------------------------------------------*/
 
 #define INCL_WIN
@@ -308,7 +307,7 @@ static VOID CkdShowPiece (HPS hps, POINTL *pptlOrg, SHORT sColor, SHORT sKing)
      GpiSetBitmap (hpsMemory, ahbmPiece[sColor][sKing]) ;
      GpiBitBlt    (hps, hpsMemory, 3L, aptl, ROP_SRCPAINT, BBO_IGNORE) ;
 
-     GpiSetBitmap (hpsMemory, NULL) ;
+     GpiSetBitmap (hpsMemory, 0) ;
      }
 
      /*---------------------------------------------------------------------
@@ -346,7 +345,7 @@ MRESULT EXPENTRY ColorDlgProc (HWND hwnd, USHORT msg, MPARAM mp1, MPARAM mp2)
      {
      static LONG  *pclr ;
      static SHORT sColor ;
-     CHAR         *pchHeading ;
+     char	*pchHeading = 0 ;
 
      switch (msg)
           {
@@ -378,7 +377,7 @@ MRESULT EXPENTRY ColorDlgProc (HWND hwnd, USHORT msg, MPARAM mp1, MPARAM mp2)
                          pclr = &clrWhitePiece ;
                          break ;
                     }
-               WinSetDlgItemText (hwnd, IDD_HEADING, pchHeading) ;
+               WinSetDlgItemText (hwnd, IDD_HEADING, (PSZ) pchHeading) ;
 
                sColor = (SHORT) *pclr ;
 
@@ -387,7 +386,7 @@ MRESULT EXPENTRY ColorDlgProc (HWND hwnd, USHORT msg, MPARAM mp1, MPARAM mp2)
 
                WinSetFocus (HWND_DESKTOP,
                             WinWindowFromID (hwnd, IDD_COLOR + sColor)) ;
-               return 1 ;
+               return (MRESULT) TRUE ;
 
           case WM_CONTROL:
                WinSendDlgItemMsg (hwnd, IDD_COLOR + sColor, BM_SETCHECK,
@@ -439,24 +438,24 @@ HPS CkdCreatePS (HWND hwnd)
                // Get colors from OS2.INI
 
      sDataSize = sizeof (LONG) ;
-     WinQueryProfileData (hab, szApplication, szClrBackground,
-                          &clrBackground, &sDataSize) ;
+     PrfQueryProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrBackground,
+                          &clrBackground, (PULONG) &sDataSize) ;
 
      sDataSize = sizeof (LONG) ;
-     WinQueryProfileData (hab, szApplication, szClrBlackSquare,
-                          &clrBlackSquare, &sDataSize) ;
+     PrfQueryProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrBlackSquare,
+                          &clrBlackSquare, (PULONG) &sDataSize) ;
 
      sDataSize = sizeof (LONG) ;
-     WinQueryProfileData (hab, szApplication, szClrWhiteSquare,
-                          &clrWhiteSquare, &sDataSize) ;
+     PrfQueryProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrWhiteSquare,
+                          &clrWhiteSquare, (PULONG) &sDataSize) ;
 
      sDataSize = sizeof (LONG) ;
-     WinQueryProfileData (hab, szApplication, szClrBlackPiece,
-                          &clrBlackPiece, &sDataSize) ;
+     PrfQueryProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrBlackPiece,
+                          &clrBlackPiece, (PULONG) &sDataSize) ;
 
      sDataSize = sizeof (LONG) ;
-     WinQueryProfileData (hab, szApplication, szClrWhitePiece,
-                          &clrWhitePiece, &sDataSize) ;
+     PrfQueryProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrWhitePiece,
+                          &clrWhitePiece, (PULONG) &sDataSize) ;
      return hps ;
      }
 
@@ -499,19 +498,19 @@ BOOL CkdDestroyPS (HPS hps)
      {
                // Save colors in OS2.INI
 
-     WinWriteProfileData (hab, szApplication, szClrBackground,
+     PrfWriteProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrBackground,
                           &clrBackground, sizeof (LONG)) ;
 
-     WinWriteProfileData (hab, szApplication, szClrBlackSquare,
+     PrfWriteProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrBlackSquare,
                           &clrBlackSquare, sizeof (LONG)) ;
 
-     WinWriteProfileData (hab, szApplication, szClrWhiteSquare,
+     PrfWriteProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrWhiteSquare,
                           &clrWhiteSquare, sizeof (LONG)) ;
 
-     WinWriteProfileData (hab, szApplication, szClrBlackPiece,
+     PrfWriteProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrBlackPiece,
                           &clrBlackPiece, sizeof (LONG)) ;
 
-     WinWriteProfileData (hab, szApplication, szClrWhitePiece,
+     PrfWriteProfileData (hab, (PCSZ) szApplication, (PCSZ) szClrWhitePiece,
                           &clrWhitePiece, sizeof (LONG)) ;
 
      return GpiDestroyPS (hps) ;
@@ -546,7 +545,7 @@ VOID CkdCreatePieces (HPS hps)
 
      CkdQueryBoardDimensions (&sizlPage) ;
 
-     hdcMemory = DevOpenDC (hab, OD_MEMORY, "*", 0L, NULL, NULL) ;
+     hdcMemory = DevOpenDC (hab, OD_MEMORY, (PCSZ) "*", 0L, NULL, 0) ;
      hpsMemory = GpiCreatePS (hab, hdcMemory, &sizlPage,
                               PU_ARBITRARY | GPIF_DEFAULT |
                               GPIT_MICRO   | GPIA_ASSOC) ;
@@ -594,7 +593,7 @@ VOID CkdCreatePieces (HPS hps)
           for (sColor = BLACK ; sColor <= WHITE ; sColor++)
                {
                ahbmPiece[sColor][sKing] =
-                         GpiCreateBitmap (hps, &bmp, 0L, 0L, NULL) ;
+                         GpiCreateBitmap (hps, (const BITMAPINFOHEADER2 *) &bmp, 0L, 0L, NULL) ;
 
                GpiSetBitmap (hpsMemory, ahbmPiece[sColor][sKing]) ;
                CkdRenderPiece (hpsMemory, CLR_FALSE,
@@ -604,12 +603,12 @@ VOID CkdCreatePieces (HPS hps)
 
                     // Create ahbmMask bitmaps
 
-          ahbmMask[sKing] = GpiCreateBitmap (hps, &bmp, 0L, 0L, NULL) ;
+          ahbmMask[sKing] = GpiCreateBitmap (hps, (const BITMAPINFOHEADER2 *) &bmp, 0L, 0L, NULL) ;
           GpiSetBitmap (hpsMemory, ahbmMask[sKing]) ;
           CkdRenderPiece (hpsMemory, CLR_TRUE, CLR_FALSE, CLR_FALSE, sKing) ;
           }
 
-     GpiSetBitmap (hpsMemory, NULL) ;
+     GpiSetBitmap (hpsMemory, 0) ;
      }
 
      /*---------------------------------------------------
@@ -623,10 +622,10 @@ VOID CkdDestroyPieces (VOID)
      for (sKing = 0 ; sKing < 2 ; sKing++)
           {
           for (sColor = BLACK ; sColor <= WHITE ; sColor++)
-               if (ahbmPiece[sColor][sKing] != NULL)
+               if (ahbmPiece[sColor][sKing] != '\0')
                     GpiDeleteBitmap (ahbmPiece[sColor][sKing]) ;
 
-          if (ahbmMask[sKing] != NULL)
+          if (ahbmMask[sKing] != '\0')
                GpiDeleteBitmap (ahbmMask[sKing]) ;
           }
 

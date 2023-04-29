@@ -1,5 +1,5 @@
 /*--------------------------------------
-   CHECKERS.H header file, version 0.10
+   CHECKERS.H header file, version 0.20
   --------------------------------------*/
 
 #define BLACK                       0
@@ -32,3 +32,10 @@ typedef struct
 
 #define IDD_HEADING                10
 #define IDD_COLOR                  20
+
+#ifndef max
+#define max(a,b) (((a) > (b)) ? (a) : (b))
+#endif
+#ifndef min
+#define min(a,b) (((a) < (b)) ? (a) : (b))
+#endif

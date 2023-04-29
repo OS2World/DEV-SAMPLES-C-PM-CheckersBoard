@@ -1,6 +1,5 @@
 /*--------------------------------------------------------------------
-   CHECKERS.C source code file, version 0.10 (draws board and pieces)
-              (c) 1990, Charles Petzold
+   CHECKERS.C source code file, version 0.20 (draws board and pieces)
   --------------------------------------------------------------------*/
 
 #define INCL_WIN
@@ -26,13 +25,13 @@ int main (void)
 
      hab = WinInitialize (0) ;
      hmq = WinCreateMsgQueue (hab, 0) ;
-     WinRegisterClass (hab, szClientClass, ClientWndProc, CS_SIZEREDRAW, 0) ;
+     WinRegisterClass (hab, (PCSZ) szClientClass, (PFNWP) ClientWndProc, CS_SIZEREDRAW, 0) ;
 
      hwndFrame = WinCreateStdWindow (HWND_DESKTOP, WS_VISIBLE,
-                                     &flFrameFlags, szClientClass, NULL,
-                                     0L, NULL, ID_RESOURCE, &hwndClient) ;
+                                     &flFrameFlags, (PCSZ) szClientClass, NULL,
+                                     0L, 0, ID_RESOURCE, &hwndClient) ;
 
-     while (WinGetMsg (hab, &qmsg, NULL, 0, 0))
+     while (WinGetMsg (hab, &qmsg, 0, 0, 0))
           WinDispatchMsg (hab, &qmsg) ;
 
      WinDestroyWindow (hwndFrame) ;
@@ -52,7 +51,7 @@ MRESULT EXPENTRY ClientWndProc (HWND hwnd, USHORT msg, MPARAM mp1, MPARAM mp2)
           {
           case WM_CREATE:
                hwndMenu = WinWindowFromID (
-                              WinQueryWindow (hwnd, QW_PARENT, FALSE),
+                              WinQueryWindow (hwnd, QW_PARENT),
                               FID_MENU) ;
 
                hps = CkdCreatePS (hwnd) ;
@@ -87,8 +86,8 @@ MRESULT EXPENTRY ClientWndProc (HWND hwnd, USHORT msg, MPARAM mp1, MPARAM mp2)
                          return 0 ;
 
                     case IDM_ABOUT:
-                         WinDlgBox (HWND_DESKTOP, hwnd, AboutDlgProc,
-                                    NULL, IDD_ABOUT_DLG, NULL) ;
+                         WinDlgBox (HWND_DESKTOP, hwnd, (PFNWP) AboutDlgProc,
+                                    0, IDD_ABOUT_DLG, NULL) ;
                          return 0 ;
 
                     case IDM_COLOR_BACKGROUND:
@@ -96,8 +95,8 @@ MRESULT EXPENTRY ClientWndProc (HWND hwnd, USHORT msg, MPARAM mp1, MPARAM mp2)
                     case IDM_COLOR_WHITE_SQUARE:
                     case IDM_COLOR_BLACK_PIECE:
                     case IDM_COLOR_WHITE_PIECE:
-                         if (!WinDlgBox (HWND_DESKTOP, hwnd, ColorDlgProc,
-                                         NULL, IDD_COLOR_DLG,
+                         if (!WinDlgBox (HWND_DESKTOP, hwnd, (PFNWP) ColorDlgProc,
+                                         0, IDD_COLOR_DLG,
                                          &(COMMANDMSG (&msg)->cmd)))
                               return 0 ;
 
